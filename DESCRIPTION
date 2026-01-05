@@ -1,0 +1,18 @@
+Package: CTRF
+Title: Cross-Temperature Response Function (CTRF)
+Version: 0.1.0
+Authors@R: 
+    person(c("Fangyu", "Brian"), "Zhong", , "brianfzk2025@proton.me", role = c("aut", "cre"))
+Description: Provides automatic tools for implementing CTRF models used in the author's research projects.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    broom,
+    dplyr,
+    ggplot2,
+    lmtest,
+    pbapply,
+    R6,
+    sandwich
