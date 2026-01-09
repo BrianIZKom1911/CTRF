@@ -28,27 +28,32 @@ print_output <- function(..., filepath, text=NULL){
 
 #' Draw and save the hourly plot as a PNG
 #' @importFrom ggplot2 ggplot geom_line geom_ribbon geom_hline labs
-#' @importFrom ggplot2 scale_x_continuous scale_y_continuous ggsave
+#' @importFrom ggplot2 annotate scale_x_continuous scale_y_continuous ggsave
 #'
 #' @param df Dataframe. Bootstrap results, usually Class method aggregate_results().
 #' @param w_name Character. Weather variable name.
-#' @param v_breaks Numeric vector.
-#' See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-breaks.
+#' @param annotext Character. Annotation text, e.g. 0:00, fixed at bottom-right
 #' @param suffix Character. Suffix in the picture name.
 #' @param save_dir Character. Directory where you save the plot.
+#' @param x_breaks Numeric vector.
+#' See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-breaks.
 #' @param y_lim Numeric vector.
 #' See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-limits.
 #'
 #' @return Invisibly returns \code{NULL}, saving the plot as an PNG.
 #' @export
-draw_save_CTRF <- function(df, w_name, v_breaks, suffix, save_dir, y_lim=NULL){
+draw_save_CTRF <- function(df, w_name, annotext, suffix, save_dir, x_breaks, y_lim=NULL){
     filename <- paste0("CTRF_", suffix, ".png")
     plot_CTRF <- ggplot()+
         geom_line(data=df, aes(x=temperature, y=fv_median))+
         geom_ribbon(data=df, aes(x=temperature, ymin=CI_lb, ymax=CI_ub), fill="grey", alpha=0.5)+
         geom_hline(yintercept=0, color="plum", linetype="solid")+
         labs(x="Temperature (C)", y=paste0(w_name, " partial effect"))+
-        scale_x_continuous(breaks = v_breaks)
+        annotate(
+            "text", x=Inf, y=-Inf,
+            label=annotext, hjust=1.3, vjust=-0.8, color="black"
+        )+
+        scale_x_continuous(breaks=x_breaks)
     if (!is.null(y_lim)) {
         plot_CTRF + scale_y_continuous(limits=y_lim)
     }

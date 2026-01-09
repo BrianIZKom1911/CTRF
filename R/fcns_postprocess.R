@@ -28,11 +28,13 @@ fff33 <- function(data, colname, a=NULL, b=NULL){
     a <- ifelse(is.null(a), min(data[[colname]]), a)
     b <- ifelse(is.null(b), max(data[[colname]]), b)
     data <- data |>
-        dplyr::mutate(ts = (.data[[colname]]-a)/(b-a),
-                      ts2 = ts^2, ts3 = ts^3,
-                      sin1 = sin(2*pi*ts), cos1 = cos(2*pi*ts),
-                      sin2 = sin(4*pi*ts), cos2 = cos(4*pi*ts),
-                      sin3 = sin(6*pi*ts), cos3 = cos(6*pi*ts))
+        dplyr::mutate(
+            ts = (.data[[colname]]-a)/(b-a),
+            ts2 = ts^2, ts3 = ts^3,
+            sin1 = sin(2*pi*ts), cos1 = cos(2*pi*ts),
+            sin2 = sin(4*pi*ts), cos2 = cos(4*pi*ts),
+            sin3 = sin(6*pi*ts), cos3 = cos(6*pi*ts)
+        )
     return(data)
 }
 
@@ -52,13 +54,15 @@ fff55 <- function(data, colname, a=NULL, b=NULL){
     a <- ifelse(is.null(a), min(data[[colname]]), a)
     b <- ifelse(is.null(b), max(data[[colname]]), b)
     data <- data |>
-        dplyr::mutate(ts = (.data[[colname]]-a)/(b-a),
-                      ts2 = ts^2, ts3 = ts^3, ts4 = ts^4, ts5 = ts^5,
-                      sin1 = sin(2*pi*ts), cos1 = cos(2*pi*ts),
-                      sin2 = sin(4*pi*ts), cos2 = cos(4*pi*ts),
-                      sin3 = sin(6*pi*ts), cos3 = cos(6*pi*ts),
-                      sin4 = sin(8*pi*ts), cos4 = cos(8*pi*ts),
-                      sin5 = sin(10*pi*ts), cos5 = cos(10*pi*ts))
+        dplyr::mutate(
+            ts = (.data[[colname]]-a)/(b-a),
+            ts2 = ts^2, ts3 = ts^3, ts4 = ts^4, ts5 = ts^5,
+            sin1 = sin(2*pi*ts), cos1 = cos(2*pi*ts),
+            sin2 = sin(4*pi*ts), cos2 = cos(4*pi*ts),
+            sin3 = sin(6*pi*ts), cos3 = cos(6*pi*ts),
+            sin4 = sin(8*pi*ts), cos4 = cos(8*pi*ts),
+            sin5 = sin(10*pi*ts), cos5 = cos(10*pi*ts)
+        )
     return(data)
 }
 
@@ -100,20 +104,33 @@ nmlize <- function(x, a=NULL, b=NULL){
 #'
 #' @param df Dataframe. The main dataset to work on.
 #' It must contain the complete list of columns.
-#' @param hour Numeric. Hour.
+#' @param hour Numeric. Your selected Hour.
+#' @param trim Boolean. Whether trim extreme temperatures. If \code{TRUE},
+#' trim at 0.1 and 99.9 quantiles. Typically, this deletes 16 obs out of an
+#' hour sample of 8400.
 #'
 #' @return An Dataframe augmented with new columns.
 #' @export
-data_finalize <- function(df, hour) {
-    df <- df |>
+data_finalize <- function(df, hour, trim=FALSE) {
+    if (trim) {
+        tl <- quantile(df$temperature[df$Hour==hour], prob=0.001, na.rm=TRUE)
+        th <- quantile(df$temperature[df$Hour==hour], prob=0.999, na.rm=TRUE)
+    } else {
+        tl <- min(df$temperature[df$Hour==hour])
+        th <- max(df$temperature[df$Hour==hour])
+    }
+    df_hr <- df |>
         dplyr::filter(Hour==hour) |>
+        dplyr::filter(temperature>=tl & temperature<=th) |>
         fff33(colname = "temperature") |> # add FFF terms
-        dplyr::mutate(prcp = precipitation,
-                      rhum = stdize(relative_humidity), # normalize or standardize variables
-                      wsp = stdize(wind_speed, median=TRUE),
-                      skc = stdize(skycover, median=TRUE),
-                      ntd = nmlize(n_day))
-    df[df$prcp > 1, "prcp"] <- 1 # winsorize precipitation
-    df$prcp <- df$prcp*10
-    return(df)
+        dplyr::mutate(
+            prcp = precipitation,
+            rhum = stdize(relative_humidity),
+            wsp = stdize(wind_speed, median=TRUE),
+            skc = stdize(skycover, median=TRUE),
+            ntd = nmlize(n_day)
+        )
+    df_hr[df_hr$prcp > 1, "prcp"] <- 1 # winsorize precipitation
+    df_hr$prcp <- df_hr$prcp*10
+    return(df_hr)
 }
