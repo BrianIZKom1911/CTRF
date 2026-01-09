@@ -4,13 +4,17 @@
 \alias{data_finalize}
 \title{Finalize the necessary modifications}
 \usage{
-data_finalize(df, hour)
+data_finalize(df, hour, trim = FALSE)
 }
 \arguments{
 \item{df}{Dataframe. The main dataset to work on.
 It must contain the complete list of columns.}
 
-\item{hour}{Numeric. Hour.}
+\item{hour}{Numeric. Your selected Hour.}
+
+\item{trim}{Boolean. Whether trim extreme temperatures. If \code{TRUE},
+trim at 0.1 and 99.9 quantiles. Typically, this deletes 16 obs out of an
+hour sample of 8400.}
 }
 \value{
 An Dataframe augmented with new columns.

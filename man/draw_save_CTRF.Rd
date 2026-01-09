@@ -4,19 +4,21 @@
 \alias{draw_save_CTRF}
 \title{Draw and save the hourly plot as a PNG}
 \usage{
-draw_save_CTRF(df, w_name, v_breaks, suffix, save_dir, y_lim = NULL)
+draw_save_CTRF(df, w_name, annotext, suffix, save_dir, x_breaks, y_lim = NULL)
 }
 \arguments{
 \item{df}{Dataframe. Bootstrap results, usually Class method aggregate_results().}
 
 \item{w_name}{Character. Weather variable name.}
 
-\item{v_breaks}{Numeric vector.
-See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-breaks.}
+\item{annotext}{Character. Annotation text, e.g. 0:00, fixed at bottom-right}
 
 \item{suffix}{Character. Suffix in the picture name.}
 
 \item{save_dir}{Character. Directory where you save the plot.}
+
+\item{x_breaks}{Numeric vector.
+See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-breaks.}
 
 \item{y_lim}{Numeric vector.
 See https://ggplot2.tidyverse.org/reference/scale_continuous.html#arg-limits.}
